@@ -16,9 +16,9 @@ namespace UltimateTicTacToeBot
             Y = y;
         }
        
-        override public String ToString()
+        override public string ToString()
         {
-            return String.Format("place_move {0} {1}", X, Y);
+            return string.Format("place_move {0} {1}", X, Y);
         }
     }
 }

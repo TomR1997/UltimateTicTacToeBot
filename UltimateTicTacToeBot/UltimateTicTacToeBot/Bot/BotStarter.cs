@@ -7,6 +7,7 @@ namespace UltimateTicTacToeBot.Bot
     class BotStarter
     {
         private readonly string empty = ".";
+        private readonly string mandatory = "-1";
 
         static void Main(string[] args)
         {
@@ -24,11 +25,11 @@ namespace UltimateTicTacToeBot.Bot
             foreach (var m in moves)
             {
                 board[m.X, m.Y] = p1;
-                scores.Add(CalculateScore(macroboard, board, m, GetTopLeft(m), p1, p2, true));
+                scores.Add(CalculateScore(macroboard, board, m, GetTopLeft(m), p1, p2, true, currentState));
                 allMoves.Add(m);
 
                 board[m.X, m.Y] = p2;
-                int score = CalculateScore(macroboard, board, m, GetTopLeft(m), p1, p2, false);
+                var score = CalculateScore(macroboard, board, m, GetTopLeft(m), p1, p2, false, currentState);
                 if (score > 0)
                 {
                     scores.Add(score);
@@ -56,7 +57,7 @@ namespace UltimateTicTacToeBot.Bot
                 board[0, 2].Equals(player) && board[1, 1].Equals(player) && board[2, 0].Equals(player));
         }
 
-        public int CalculateScore(string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, bool isp1)
+        public int CalculateScore(string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, bool isp1, BotState currentState)
         {
             if (CheckWinGame(macroboard, p1))
             {
@@ -68,15 +69,15 @@ namespace UltimateTicTacToeBot.Bot
             }
             else if (CheckWinTile(topLeft, board, p1))
             {
-                return 100;
+                return 250;
             }
             else if (CheckWinTile(topLeft, board, p2))
             {
-                return -100;
+                return -250;
             }
             else if (isp1)
             {
-                return CheckGameWonOrFull(BestInRow(board, move, topLeft, p1), macroboard, board, move, topLeft, p1, p2);
+                return CheckGameWonOrFull(BestInRow(board, move, topLeft, p1), macroboard, board, move, topLeft, p1, p2, currentState);
             }
             else
             {
@@ -215,19 +216,19 @@ namespace UltimateTicTacToeBot.Bot
             return score;
         }
 
-        public int CheckGameWonOrFull(int rowScore, string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2)
+        public int CheckGameWonOrFull(int rowScore, string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, BotState currentState)
         {
             var originMove = new Move(move.X - topLeft.X, move.Y - topLeft.Y);
             var microboardMove = new Move(originMove.X * 3, originMove.Y * 3);
-            if (macroboard[originMove.X, originMove.Y].Equals(p1) || macroboard[originMove.X, originMove.Y].Equals(p2) || CheckEnemyCanWinTile(board, GetTopLeft(microboardMove), p1))
+            if (macroboard[originMove.X, originMove.Y].Equals(p1) || macroboard[originMove.X, originMove.Y].Equals(p2) || CheckEnemyCanWinTile(macroboard, board, originMove, GetTopLeft(microboardMove), p1, currentState, move))
             {
                 return 0;
             }
-
+            Console.Error.WriteLine(rowScore+", " + move);
             return rowScore;
         }
 
-        public bool CheckEnemyCanWinTile(string[,] board, Move topLeft, string player)
+        public bool CheckEnemyCanWinTile(string[,] macroboard, string[,] board, Move originMove, Move topLeft, string player, BotState currentState, Move move)
         {
             int worst = 0;
             worst = WorstScore(worst, CalculateRowValueOne(board, topLeft, player));
@@ -238,8 +239,7 @@ namespace UltimateTicTacToeBot.Bot
             worst = WorstScore(worst, CalculateColumnValueThree(board, topLeft, player));
             worst = WorstScore(worst, CalculateDiagonalValueOne(board, topLeft, player));
             worst = WorstScore(worst, CalculateDiagonalValueTwo(board, topLeft, player));
-
-            return worst <= -2;
+            return worst < -4;
         }
 
         public int WorstScore(int worst, int current)
@@ -253,7 +253,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + i, topLeft.Y].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + i, topLeft.Y].Equals(empty))
                 {
@@ -261,7 +261,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -275,7 +275,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + i, topLeft.Y + 1].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + i, topLeft.Y + 1].Equals(empty))
                 {
@@ -283,7 +283,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -297,7 +297,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + i, topLeft.Y + 2].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + i, topLeft.Y + 2].Equals(empty))
                 {
@@ -305,7 +305,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -319,7 +319,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X, topLeft.Y + i].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X, topLeft.Y + i].Equals(empty))
                 {
@@ -327,7 +327,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -341,7 +341,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + 1, topLeft.Y + i].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + 1, topLeft.Y + i].Equals(empty))
                 {
@@ -349,7 +349,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -363,7 +363,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + 2, topLeft.Y + i].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + 2, topLeft.Y + i].Equals(empty))
                 {
@@ -371,7 +371,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -385,7 +385,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + i, topLeft.Y + i].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + i, topLeft.Y + i].Equals(empty))
                 {
@@ -393,7 +393,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 
@@ -407,7 +407,7 @@ namespace UltimateTicTacToeBot.Bot
             {
                 if (board[topLeft.X + i, topLeft.Y + 2 - i].Equals(player))
                 {
-                    score += 3;
+                    score += 2;
                 }
                 else if (board[topLeft.X + i, topLeft.Y + 2 - i].Equals(empty))
                 {
@@ -415,7 +415,7 @@ namespace UltimateTicTacToeBot.Bot
                 }
                 else
                 {
-                    score -= 2;
+                    score -= 3;
                 }
             }
 

@@ -10,8 +10,8 @@ namespace UltimateTicTacToeBot
     /// </summary>
     class Field
     {
-        public const String EmptyField = ".";
-        public const String AvailableField = "-1";
+        public const string EmptyField = ".";
+        public const string AvailableField = "-1";
 
         // Size of board
         public const int Cols = 9;
@@ -20,8 +20,8 @@ namespace UltimateTicTacToeBot
         public int MyId { get; set; }
         public int OpponentId { get; set; }      
         
-        private string[,] board;
-        private string[,] macroboard;
+        private readonly string[,] board;
+        private readonly string[,] macroboard;
 
         public Field()
         {

@@ -28,7 +28,7 @@ namespace UltimateTicTacToeBot.Bot
 			{
 				if (line.Length == 0) continue;
 
-				String[] parts = line.Split(' ');
+                string[] parts = line.Split(' ');
 				switch (parts[0])
 				{
 					case "settings":
@@ -70,7 +70,7 @@ namespace UltimateTicTacToeBot.Bot
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        private void ParseSettings(String key, String value)
+        private void ParseSettings(string key, string value)
 		{
 			try
 			{
@@ -85,8 +85,8 @@ namespace UltimateTicTacToeBot.Bot
 						currentState.TimePerMove = Convert.ToInt32(value);
 						break;
 					case "player_names":
-						String[] playerNames = value.Split(',');
-						foreach (String playerName in playerNames)
+                        string[] playerNames = value.Split(',');
+						foreach (string playerName in playerNames)
 						{
 							Player player = new Player(playerName);
 							currentState.Players.Add(playerName, player);
@@ -102,14 +102,14 @@ namespace UltimateTicTacToeBot.Bot
 						currentState.Field.OpponentId = opponentId;
 						break;
 					default:
-						Console.Error.WriteLine(String.Format(
+						Console.Error.WriteLine(string.Format(
 								"Cannot parse settings input with key '{0}'", key));
 						break;
 				}
 			}
 			catch (Exception e)
 			{
-				Console.Error.WriteLine(String.Format(
+				Console.Error.WriteLine(string.Format(
 						"Cannot parse settings value '{0}' for key '{1}'", value, key));
 				Console.Error.WriteLine(e.StackTrace);
 			}
@@ -120,7 +120,7 @@ namespace UltimateTicTacToeBot.Bot
 		/// </summary>
 		/// <param name="key"></param>
 		/// <param name="value"></param>
-		private void ParseGameData(String key, String value)
+		private void ParseGameData(string key, string value)
 		{
 			try
 			{
@@ -139,14 +139,14 @@ namespace UltimateTicTacToeBot.Bot
 						currentState.Field.ParseMacroboardFromString(value);
 						break;
 					default:
-						Console.Error.WriteLine(String.Format(
+						Console.Error.WriteLine(string.Format(
 								"Cannot parse game data input with key '{0}'", key));
 						break;
 				}
 			}
 			catch (Exception e)
 			{
-				Console.Error.WriteLine(String.Format(
+				Console.Error.WriteLine(string.Format(
 						"Cannot parse game data value '{0}' for key '{1}'", value, key));
 				Console.Error.WriteLine(e.StackTrace);
 			}
