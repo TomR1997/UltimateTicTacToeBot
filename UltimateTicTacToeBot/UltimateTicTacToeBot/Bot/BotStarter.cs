@@ -42,19 +42,19 @@ namespace UltimateTicTacToeBot.Bot
             return BestMove(scores, allMoves);
         }
 
-        public bool CheckWinGame(string[,] board, string player)
+        public bool CheckWinGame(string[,] macroboard, string player)
         {
             return (
-                board[0, 0].Equals(player) && board[1, 0].Equals(player) && board[2, 0].Equals(player) ||
-                board[0, 1].Equals(player) && board[1, 1].Equals(player) && board[2, 1].Equals(player) ||
-                board[0, 2].Equals(player) && board[1, 2].Equals(player) && board[2, 2].Equals(player) ||
+                macroboard[0, 0].Equals(player) && macroboard[1, 0].Equals(player) && macroboard[2, 0].Equals(player) ||
+                macroboard[0, 1].Equals(player) && macroboard[1, 1].Equals(player) && macroboard[2, 1].Equals(player) ||
+                macroboard[0, 2].Equals(player) && macroboard[1, 2].Equals(player) && macroboard[2, 2].Equals(player) ||
 
-                board[0, 0].Equals(player) && board[0, 1].Equals(player) && board[0, 2].Equals(player) ||
-                board[1, 0].Equals(player) && board[1, 1].Equals(player) && board[1, 2].Equals(player) ||
-                board[2, 0].Equals(player) && board[2, 1].Equals(player) && board[2, 2].Equals(player) ||
+                macroboard[0, 0].Equals(player) && macroboard[0, 1].Equals(player) && macroboard[0, 2].Equals(player) ||
+                macroboard[1, 0].Equals(player) && macroboard[1, 1].Equals(player) && macroboard[1, 2].Equals(player) ||
+                macroboard[2, 0].Equals(player) && macroboard[2, 1].Equals(player) && macroboard[2, 2].Equals(player) ||
 
-                board[0, 0].Equals(player) && board[1, 1].Equals(player) && board[2, 2].Equals(player) ||
-                board[0, 2].Equals(player) && board[1, 1].Equals(player) && board[2, 0].Equals(player));
+                macroboard[0, 0].Equals(player) && macroboard[1, 1].Equals(player) && macroboard[2, 2].Equals(player) ||
+                macroboard[0, 2].Equals(player) && macroboard[1, 1].Equals(player) && macroboard[2, 0].Equals(player));
         }
 
         public int CalculateScore(string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, bool isp1, BotState currentState)
@@ -218,14 +218,18 @@ namespace UltimateTicTacToeBot.Bot
         public bool CheckEnemyCanWinTile(string[,] macroboard, string[,] board, Move originMove, Move topLeft, string player, BotState currentState, Move move)
         {
             int worst = 0;
-            worst = WorstScore(worst, CalculateRowValueOne(board, topLeft, player));
-            worst = WorstScore(worst, CalculateRowValueTwo(board, topLeft, player));
-            worst = WorstScore(worst, CalculateRowValueThree(board, topLeft, player));
-            worst = WorstScore(worst, CalculateColumnValueOne(board, topLeft, player));
-            worst = WorstScore(worst, CalculateColumnValueTwo(board, topLeft, player));
-            worst = WorstScore(worst, CalculateColumnValueThree(board, topLeft, player));
-            worst = WorstScore(worst, CalculateDiagonalValueOne(board, topLeft, player));
-            worst = WorstScore(worst, CalculateDiagonalValueTwo(board, topLeft, player));
+			if (!macroboard[originMove.X, originMove.Y].Equals(mandatory))
+			{
+				worst = WorstScore(worst, CalculateRowValueOne(board, topLeft, player));
+				worst = WorstScore(worst, CalculateRowValueTwo(board, topLeft, player));
+				worst = WorstScore(worst, CalculateRowValueThree(board, topLeft, player));
+				worst = WorstScore(worst, CalculateColumnValueOne(board, topLeft, player));
+				worst = WorstScore(worst, CalculateColumnValueTwo(board, topLeft, player));
+				worst = WorstScore(worst, CalculateColumnValueThree(board, topLeft, player));
+				worst = WorstScore(worst, CalculateDiagonalValueOne(board, topLeft, player));
+				worst = WorstScore(worst, CalculateDiagonalValueTwo(board, topLeft, player));
+			}
+
             return worst < -4;
         }
 
