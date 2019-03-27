@@ -77,7 +77,7 @@ namespace UltimateTicTacToeBot.Bot
             }
             else if (isp1)
             {
-                return CheckGameWonOrFull(BestInRow(board, move, topLeft, p1), macroboard, board, move, topLeft, p1, p2, currentState);
+                return CheckGameWonOrFull(macroboard, board, move, topLeft, p1, p2, currentState) ? 0 : BestInRow(board, move, topLeft, p1);
             }
             else
             {
@@ -137,19 +137,11 @@ namespace UltimateTicTacToeBot.Bot
             var p1bestmove = scores.Max();
             var p2bestmove = scores.Min();
 
-            if (p1bestmove >= (p2bestmove * -1))
-            {
-                return moves[scores.IndexOf(p1bestmove)];
-            }
-            else
-            {
-                return moves[scores.IndexOf(p2bestmove)];
-            }
+			return p1bestmove >= (p2bestmove * -1) ? moves[scores.IndexOf(p1bestmove)] : moves[scores.IndexOf(p2bestmove)];
         }
         public int BestInRow(string[,] board, Move move, Move topLeft, string player)
         {
             var score = 0;
-
             var originMove = new Move(move.X - topLeft.X, move.Y - topLeft.Y);
 
             if (originMove.X == 0)
@@ -216,16 +208,11 @@ namespace UltimateTicTacToeBot.Bot
             return score;
         }
 
-        public int CheckGameWonOrFull(int rowScore, string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, BotState currentState)
+        public bool CheckGameWonOrFull(string[,] macroboard, string[,] board, Move move, Move topLeft, string p1, string p2, BotState currentState)
         {
             var originMove = new Move(move.X - topLeft.X, move.Y - topLeft.Y);
             var microboardMove = new Move(originMove.X * 3, originMove.Y * 3);
-            if (macroboard[originMove.X, originMove.Y].Equals(p1) || macroboard[originMove.X, originMove.Y].Equals(p2) || CheckEnemyCanWinTile(macroboard, board, originMove, GetTopLeft(microboardMove), p1, currentState, move))
-            {
-                return 0;
-            }
-            Console.Error.WriteLine(rowScore+", " + move);
-            return rowScore;
+            return (macroboard[originMove.X, originMove.Y].Equals(p1) || macroboard[originMove.X, originMove.Y].Equals(p2) || CheckEnemyCanWinTile(macroboard, board, originMove, GetTopLeft(microboardMove), p1, currentState, move)) ? true : false;
         }
 
         public bool CheckEnemyCanWinTile(string[,] macroboard, string[,] board, Move originMove, Move topLeft, string player, BotState currentState, Move move)
